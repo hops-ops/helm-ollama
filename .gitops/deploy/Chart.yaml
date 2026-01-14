@@ -1,0 +1,5 @@
+apiVersion: v2
+name: helm-ollama
+version: 0.0.0
+description: GitOps packaging for the Ollama Crossplane configuration
+appVersion: 1.37.0

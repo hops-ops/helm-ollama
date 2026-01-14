@@ -1,0 +1,40 @@
+# code: language=yaml
+#
+# Helm release for Ollama
+#
+# Ollama is an open-source tool for running LLMs locally.
+#
+
+{{- $ol := $state.ollama }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $ol.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-ollama" }}
+  labels: {{ $ol.labels | toJson }}
+spec:
+  managementPolicies: {{ $ol.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: ollama
+      repository: https://helm.otwld.com/
+      version: 1.37.0
+    namespace: {{ $ol.namespace }}
+    {{- if $ol.overrideAllValues }}
+    values:
+      {{- toYaml $ol.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: ollama
+      nameOverride: ollama
+      {{- if $ol.values }}
+      {{- toYaml $ol.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $ol.providerConfigRef.name }}
+    kind: {{ $ol.providerConfigRef.kind }}
